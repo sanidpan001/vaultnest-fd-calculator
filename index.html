@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VaultNest — Fixed Deposit (FD) Calculator</title>
+<meta name="description" content="VaultNest is a free Fixed Deposit (FD) Calculator with senior citizen rate toggle, monthly and quarterly payout modes, premature withdrawal penalty estimate and a year-wise growth table.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>body{font-family:Inter,system-ui,sans-serif;background:#f4ecda} .font-display{font-family:Fraunces,serif} .ledger{background:repeating-linear-gradient(#fff,#fff 31px,#e7dcc3 32px)} input:focus,select:focus{border-color:#0f766e!important;box-shadow:0 0 0 3px rgba(15,118,110,.2);outline:none}</style>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How is fixed deposit maturity calculated in VaultNest?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "VaultNest uses compound interest: maturity equals principal multiplied by (1 + rate divided by compounding periods) raised to the power of compounding periods times years. With quarterly compounding, which most Indian banks use, interest is added every three months and then itself earns interest. Change the compounding frequency in the calculator to see how monthly or annual compounding would change the result for the same headline rate."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What does the senior citizen toggle actually do?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Most Indian banks pay senior citizens an extra 0.50 percentage points on fixed deposits. Turning the toggle on adds that 0.50% to your entered base rate before any calculation runs, so the maturity value, payout amounts, and year-wise table all reflect the higher effective rate. Always confirm the exact senior premium with your bank, because some tenures and special schemes carry a different bonus."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do monthly and quarterly payout FDs differ from lump sum?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A lump-sum or cumulative FD compounds all interest until maturity, so you earn interest on interest. A monthly or quarterly payout FD is non-cumulative: interest is paid out to your savings account at each interval and does not compound. VaultNest shows the per-payout amount and the total paid out, so you can compare the steady income against the larger final corpus of the cumulative option."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What happens if I withdraw my FD early?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Banks usually allow premature withdrawal but cut the interest rate, commonly by 0.50% to 1.00%, and pay the rate for the period actually completed rather than the booked tenure. The premature withdrawal estimator in VaultNest applies your chosen penalty to the effective rate and shows both the amount you would receive and the interest cost of breaking the deposit early."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is the interest on a fixed deposit taxable?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. In India, FD interest is taxed at your income tax slab rate in the year it accrues, and banks deduct TDS when interest crosses the prescribed threshold in a financial year. VaultNest shows pre-tax figures, because your slab, deductions, and Form 15G or 15H eligibility are personal. Treat the maturity value as the gross amount and plan tax separately, especially for large deposits."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Should I choose a short or a long FD tenure?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It depends on when you need the money and where interest rates may go next. Short tenures preserve flexibility and let you reinvest if rates rise, while longer tenures lock a good rate when rates look likely to fall. Many savers ladder deposits across several maturities so part of the money comes due every year. The year-wise growth table in VaultNest helps you see exactly what each extra year adds."
+      }
+    }
+  ]
+}</script>
+</head>
+<body id="top">
+<header class="sticky top-0 z-50 bg-[#0b2f2d] text-white shadow"><div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between"><a href="#top" class="flex items-center gap-2 font-display text-2xl font-black">🏦 VaultNest</a><nav class="flex gap-4 text-sm font-semibold"><a href="#top" class="hover:text-amber-200">Home</a><a href="https://fixoraa.tech" class="hover:text-amber-200">More Tools</a></nav></div></header>
+<div class="no-print mx-auto max-w-6xl px-4 sm:px-6 pt-4" role="complementary" aria-label="Advertisement">
+  <div class="mx-auto text-center" style="max-width:728px">
+    <span class="block text-[10px] tracking-[0.18em] uppercase text-slate-400 mb-1.5">Advertisement</span>
+    <div class="flex justify-center overflow-hidden">
+      <div class="origin-top scale-[0.44] sm:scale-100 shrink-0">
+        <script>
+          atOptions = { 'key' : '4e68ac77881c17fe128a46565d9a4e8c', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {} };
+        </script>
+        <script src="https://www.highrevenueformat.com/4e68ac77881c17fe128a46565d9a4e8c/invoke.js"></script>
+      </div>
+    </div>
+  </div>
+</div>
+<main class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+<section class="text-center mb-6"><span class="inline-block bg-teal-700 text-white text-xs font-bold px-3 py-1 rounded-full">✦ Unlimited Free Usage</span><h1 class="font-display text-4xl sm:text-5xl font-black text-[#0b2f2d] mt-3">Fixed Deposit Calculator</h1><p class="text-slate-600 mt-2 max-w-2xl mx-auto">See maturity, monthly income, the cost of breaking early, and every year of growth — in one honest ledger.</p></section>
+<div class="grid lg:grid-cols-5 gap-5">
+<section class="lg:col-span-2 bg-[#0b2f2d] text-white rounded-2xl p-6 shadow-xl space-y-4">
+<label class="block text-sm font-semibold">Deposit amount (₹)<input id="principal" type="number" value="100000" min="0" class="mt-1 w-full rounded-lg px-3 py-2.5 text-slate-900 border-2 border-transparent"></label>
+<label class="block text-sm font-semibold">Annual interest rate (%)<input id="rate" type="number" value="7.1" step="0.05" class="mt-1 w-full rounded-lg px-3 py-2.5 text-slate-900 border-2 border-transparent"></label>
+<label class="block text-sm font-semibold">Tenure (years)<input id="years" type="number" value="5" step="0.5" min="0" class="mt-1 w-full rounded-lg px-3 py-2.5 text-slate-900 border-2 border-transparent"></label>
+<label class="block text-sm font-semibold">Compounding frequency<select id="comp" class="mt-1 w-full rounded-lg px-3 py-2.5 text-slate-900 border-2 border-transparent"><option value="4" selected>Quarterly (most banks)</option><option value="12">Monthly</option><option value="2">Half-yearly</option><option value="1">Annually</option></select></label>
+<label class="block text-sm font-semibold">Payout mode<select id="mode" class="mt-1 w-full rounded-lg px-3 py-2.5 text-slate-900 border-2 border-transparent"><option value="lump" selected>Lump sum at maturity (cumulative)</option><option value="monthly">Monthly payout</option><option value="quarterly">Quarterly payout</option></select></label>
+<label class="flex items-center justify-between bg-white/10 rounded-lg px-3 py-3 cursor-pointer"><span class="text-sm font-semibold">👴 Senior citizen (+0.50%)</span><input id="senior" type="checkbox" class="w-5 h-5 accent-amber-400"></label>
+<p id="effRate" class="text-amber-200 text-sm font-semibold"></p>
+<div class="border-t border-white/20 pt-4 space-y-3"><p class="font-display font-bold">Premature withdrawal estimate</p>
+<label class="block text-sm font-semibold">Withdraw after (years)<input id="earlyYears" type="number" value="2" step="0.5" class="mt-1 w-full rounded-lg px-3 py-2.5 text-slate-900 border-2 border-transparent"></label>
+<label class="block text-sm font-semibold">Penalty (% points)<input id="penalty" type="number" value="1" step="0.25" class="mt-1 w-full rounded-lg px-3 py-2.5 text-slate-900 border-2 border-transparent"></label></div>
+<p id="msg" class="text-amber-200 text-sm min-h-[1.25rem]"></p>
+<button id="copyBtn" class="w-full bg-amber-400 hover:bg-amber-300 text-[#0b2f2d] font-bold py-2.5 rounded-lg">Copy Summary</button>
+</section>
+<section class="lg:col-span-3 space-y-4">
+<div class="grid sm:grid-cols-3 gap-4">
+<div class="ledger rounded-2xl border border-[#d8cdb4] p-5 shadow"><p class="text-xs uppercase tracking-wider text-slate-500 font-bold">Maturity Value</p><p id="rMaturity" class="font-display text-3xl font-black text-teal-800 mt-1">—</p></div>
+<div class="ledger rounded-2xl border border-[#d8cdb4] p-5 shadow"><p class="text-xs uppercase tracking-wider text-slate-500 font-bold">Interest Earned</p><p id="rInterest" class="font-display text-3xl font-black text-teal-800 mt-1">—</p></div>
+<div class="ledger rounded-2xl border border-[#d8cdb4] p-5 shadow"><p class="text-xs uppercase tracking-wider text-slate-500 font-bold" id="rPayoutLabel">Payout</p><p id="rPayout" class="font-display text-3xl font-black text-teal-800 mt-1">—</p><p id="rPayoutSub" class="text-xs text-slate-500 mt-1"></p></div>
+</div>
+<div class="bg-[#fff8e6] rounded-2xl border-2 border-dashed border-amber-500/60 p-5"><h2 class="font-display font-bold text-lg text-[#0b2f2d]">If you break this FD early…</h2><p id="rEarly" class="text-slate-700 mt-1 leading-relaxed">—</p></div>
+<div class="bg-white rounded-2xl border border-[#d8cdb4] p-5 shadow overflow-x-auto"><h2 class="font-display font-bold text-lg text-[#0b2f2d] mb-3">Year-wise growth ledger</h2><table class="w-full text-sm min-w-[420px]"><thead><tr class="text-left text-slate-500 border-b"><th class="py-2">Year</th><th>Opening</th><th>Interest</th><th>Closing</th></tr></thead><tbody id="tbody"></tbody></table></div>
+</section>
+</div>
+</main>
+<div class="no-print mx-auto max-w-6xl px-4 sm:px-6 pb-4" role="complementary" aria-label="Advertisement">
+  <div class="mx-auto text-center" style="max-width:728px">
+    <span class="block text-[10px] tracking-[0.18em] uppercase text-slate-400 mb-1.5">Advertisement</span>
+    <div class="flex justify-center overflow-hidden">
+      <script async src="https://js.wpadmngr.com/static/adManager.js" data-admpid="464498"></script>
+    </div>
+  </div>
+</div>
+<section class="max-w-4xl mx-auto px-4 sm:px-6 py-10">
+<article id="seo-article" class="space-y-4 text-slate-700 leading-relaxed [&>h2]:font-display [&>h2]:text-2xl [&>h2]:font-black [&>h2]:text-[#0b2f2d] [&>h2]:pt-4"><p>A fixed deposit, often shortened to FD, remains one of the most trusted savings instruments in the world because it replaces uncertainty with a simple promise: deposit a lump sum today, leave it untouched for an agreed period, and receive a known amount on a known date. VaultNest was built to make that promise completely transparent. Instead of showing only a single maturity figure, this calculator exposes every moving part of an FD — the effective rate after a senior citizen premium, the difference between taking interest as a monthly income and letting it compound, the cost of breaking the deposit early, and a year-by-year ledger of how the balance actually grows. When you can see each of those pieces clearly, choosing a tenure and a payout style stops being guesswork and becomes a deliberate financial decision.</p>
+<h2>How fixed deposit interest really works</h2>
+<p>At its heart, a fixed deposit earns compound interest. The bank takes your principal, applies the annual interest rate, and credits interest at regular intervals — most commonly every quarter in India. Once that first interest credit lands, it becomes part of the balance, so the next quarter's interest is calculated on a slightly larger amount. That quiet snowball effect is why two deposits with the same headline rate can end with different maturity values: the one compounded more frequently grows a little faster. The mathematical engine behind VaultNest follows the standard formula, maturity equals principal multiplied by one plus the rate divided by the number of compounding periods per year, all raised to the power of periods multiplied by years. It is the same formula banks use, presented without any hidden adjustments, rounding tricks, or optimistic assumptions.</p>
+<p>Understanding compounding also explains why the last year of a long deposit adds more interest than the first year. In year one, interest is earned only on your original principal. By year five, interest is being earned on the principal plus four years of accumulated interest. The year-wise growth table in this calculator makes that acceleration visible row by row: opening balance, interest earned during the year, and closing balance. Many savers find that seeing the table changes how they think about tenure. Extending a deposit from three years to five may look modest in rate terms, yet the table reveals how much extra the final two years contribute once compounding is working on a larger base.</p>
+<h2>Cumulative versus payout deposits: income now or growth later</h2>
+<p>Every fixed deposit forces a trade-off between income today and a larger corpus tomorrow. A cumulative deposit, the lump sum option in VaultNest, reinvests every interest credit until maturity. It is the natural choice for goals that sit a few years away — a child's education fund, a future home down payment, or a retirement top-up — because nothing leaks out along the way and compounding works at full strength. A payout deposit works differently. Interest is calculated on the principal and paid out monthly or quarterly into your savings account, while the principal itself stays intact and is returned at maturity. Retirees and anyone supplementing a salary often prefer this rhythm because it converts a lump sum into a predictable income stream without touching the capital.</p>
+<p>The numbers deserve a careful look before you decide. A monthly payout feels generous because money arrives twelve times a year, but each payout is interest that will never compound. Over a five or ten year horizon, the total interest paid out in instalments is noticeably smaller than the interest a cumulative deposit accumulates. VaultNest places the two outcomes side by side: switch the payout mode and the results update instantly, showing the per-payout amount, the number of payouts, the total paid out, and the maturity corpus for comparison. A discounted detail is also worth knowing — for monthly payout deposits, many banks apply a small discount because interest reaches you earlier than the quarterly credit cycle, so the effective monthly amount can be marginally lower than a simple division by twelve. Check your bank's payout schedule for its exact convention.</p>
+<h2>The senior citizen premium, explained honestly</h2>
+<p>Banks in India typically reward depositors aged sixty and above with an additional interest rate, most commonly half a percentage point above the standard card rate. On a small deposit held for a year, that premium may buy a modest extra amount. On a large deposit held for five years, compounding turns the extra half percent into a meaningful sum. The senior citizen toggle in VaultNest adds 0.50 percentage points to whatever base rate you enter, then recalculates everything — maturity, payouts, premature estimates, and the yearly table — at the higher effective rate. This design is deliberate: you enter the rate advertised to the general public, and the toggle shows precisely what the senior premium is worth in rupees rather than leaving you to estimate it mentally.</p>
+<p>A few practical cautions apply. Some banks restrict the senior premium on very short tenures or on special promotional schemes, and joint deposits usually qualify only when the senior citizen is the first account holder. Tax treatment does not change with age for the deposit itself, although senior citizens receive a dedicated deduction on interest income under the applicable provisions, which can soften the tax bill. Always confirm the current premium and eligibility on the bank's official rate card before booking, because rates change with monetary policy and can differ between branches, online bookings, and special tenure buckets.</p>
+<h2>Premature withdrawal: the penalty nobody reads about</h2>
+<p>Life does not always respect deposit tenures. A medical emergency, a sudden business opportunity, or a home purchase can force a depositor to break an FD early, and that is where the premature withdrawal penalty quietly erodes returns. The standard practice is twofold. First, the bank pays interest at the rate applicable to the period the deposit actually remained with the bank, not the originally booked rate. Second, it subtracts a penalty, commonly between half a percent and one percent, from that applicable rate. A deposit booked at an attractive long-term rate can therefore end up earning a surprisingly modest return if it is broken within the first year or two.</p>
+<p>The estimator built into VaultNest models exactly that mechanism. Enter how long the deposit has actually run and the penalty your bank charges, and the tool recalculates the value at the reduced rate, placing it beside the value you would have received without the penalty. The difference, labelled as the penalty cost, is the true price of exiting early. Seeing that figure before you act can change the decision entirely: sometimes withdrawing a smaller savings balance or waiting a few more months until the deposit crosses into a better rate bucket saves far more than the convenience of breaking it today. Some banks waive the penalty for senior citizens, for deposits below a threshold, or when the proceeds are reinvested with the same bank, so ask about waivers before submitting a closure request.</p>
+<h2>Laddering: a smarter way to hold several deposits</h2>
+<p>Once you understand compounding, payouts, and penalties, a classic strategy ties them together: laddering. Instead of placing an entire savings corpus into a single deposit with one maturity date, you split it across several deposits maturing in successive years. One portion comes due every year, giving regular liquidity without premature penalties, while the longer portions keep earning the higher long-term rates. If interest rates rise, each maturing rung can be reinvested at the new higher rate; if rates fall, most of your money remains locked at yesterday's better rates. VaultNest supports ladder planning naturally — run the calculator once per rung, compare the year-wise tables, and note how the staggered maturities behave. Many savers build a five-rung ladder over time, adding a new longest rung each year as the shortest one matures.</p>
+<h2>Tax, inflation, and the real return</h2>
+<p>A maturity figure is a gross, pre-tax number, and honest planning looks beyond it. Interest from fixed deposits is taxed at your marginal income tax slab in India, and banks deduct tax at source once interest crosses the notified threshold during a financial year. A deposit advertising seven percent may therefore deliver noticeably less after tax for someone in a higher slab. Inflation matters too: if prices rise at five percent a year while your deposit earns seven percent before tax, the purchasing power of your corpus grows far more slowly than the headline number suggests. None of this makes fixed deposits a poor choice — their role is capital protection and certainty, not maximum growth — but it does mean the wisest use of an FD is for money you cannot afford to put at risk, held for a defined period, inside a broader plan that may also include higher-growth assets for distant goals.</p>
+<h2>How to use VaultNest step by step</h2>
+<p>Start with the deposit amount and the annual rate your bank is offering for the tenure you have in mind. Choose the tenure in years — fractional values such as 1.5 are accepted for eighteen-month deposits — and pick the compounding frequency, which is quarterly for most Indian banks. If the deposit belongs to a senior citizen, turn on the toggle and watch the effective rate update. Next, select a payout mode: lump sum to see the full compounded maturity, or monthly or quarterly to see the income stream a payout deposit would generate. Below the headline results, open the premature withdrawal panel if there is any chance you might need the money early, and enter the elapsed period and penalty to see the exit cost. Finally, read the year-wise ledger to confirm the growth path matches your goal date. Every figure updates without reloading the page, and nothing you type leaves your browser, so you can test as many scenarios as you like in complete privacy.</p>
+<p>Fixed deposits reward savers who read the fine print, and the fine print is exactly what this calculator brings into the open. Compare tenures, respect the penalty, claim the senior premium when it is due, and let compounding do its patient work. Whether you are parking an emergency fund, building a guaranteed income in retirement, or laddering deposits toward a future goal, VaultNest gives you the numbers — all of them — before you commit a single rupee.</p>
+</article>
+<h2 class="font-display text-3xl font-black text-[#0b2f2d] mt-10 mb-4">Frequently Asked Questions</h2>
+<div class="space-y-3"><details class="bg-white rounded-xl border border-[#d8cdb4] p-5" open><summary class="font-semibold cursor-pointer text-[#0b2f2d]">How is fixed deposit maturity calculated in VaultNest?</summary><p class="mt-2 text-slate-600 leading-relaxed">VaultNest uses compound interest: maturity equals principal multiplied by (1 + rate divided by compounding periods) raised to the power of compounding periods times years. With quarterly compounding, which most Indian banks use, interest is added every three months and then itself earns interest. Change the compounding frequency in the calculator to see how monthly or annual compounding would change the result for the same headline rate.</p></details>
+<details class="bg-white rounded-xl border border-[#d8cdb4] p-5" ><summary class="font-semibold cursor-pointer text-[#0b2f2d]">What does the senior citizen toggle actually do?</summary><p class="mt-2 text-slate-600 leading-relaxed">Most Indian banks pay senior citizens an extra 0.50 percentage points on fixed deposits. Turning the toggle on adds that 0.50% to your entered base rate before any calculation runs, so the maturity value, payout amounts, and year-wise table all reflect the higher effective rate. Always confirm the exact senior premium with your bank, because some tenures and special schemes carry a different bonus.</p></details>
+<details class="bg-white rounded-xl border border-[#d8cdb4] p-5" ><summary class="font-semibold cursor-pointer text-[#0b2f2d]">How do monthly and quarterly payout FDs differ from lump sum?</summary><p class="mt-2 text-slate-600 leading-relaxed">A lump-sum or cumulative FD compounds all interest until maturity, so you earn interest on interest. A monthly or quarterly payout FD is non-cumulative: interest is paid out to your savings account at each interval and does not compound. VaultNest shows the per-payout amount and the total paid out, so you can compare the steady income against the larger final corpus of the cumulative option.</p></details>
+<details class="bg-white rounded-xl border border-[#d8cdb4] p-5" ><summary class="font-semibold cursor-pointer text-[#0b2f2d]">What happens if I withdraw my FD early?</summary><p class="mt-2 text-slate-600 leading-relaxed">Banks usually allow premature withdrawal but cut the interest rate, commonly by 0.50% to 1.00%, and pay the rate for the period actually completed rather than the booked tenure. The premature withdrawal estimator in VaultNest applies your chosen penalty to the effective rate and shows both the amount you would receive and the interest cost of breaking the deposit early.</p></details>
+<details class="bg-white rounded-xl border border-[#d8cdb4] p-5" ><summary class="font-semibold cursor-pointer text-[#0b2f2d]">Is the interest on a fixed deposit taxable?</summary><p class="mt-2 text-slate-600 leading-relaxed">Yes. In India, FD interest is taxed at your income tax slab rate in the year it accrues, and banks deduct TDS when interest crosses the prescribed threshold in a financial year. VaultNest shows pre-tax figures, because your slab, deductions, and Form 15G or 15H eligibility are personal. Treat the maturity value as the gross amount and plan tax separately, especially for large deposits.</p></details>
+<details class="bg-white rounded-xl border border-[#d8cdb4] p-5" ><summary class="font-semibold cursor-pointer text-[#0b2f2d]">Should I choose a short or a long FD tenure?</summary><p class="mt-2 text-slate-600 leading-relaxed">It depends on when you need the money and where interest rates may go next. Short tenures preserve flexibility and let you reinvest if rates rise, while longer tenures lock a good rate when rates look likely to fall. Many savers ladder deposits across several maturities so part of the money comes due every year. The year-wise growth table in VaultNest helps you see exactly what each extra year adds.</p></details></div>
+</section>
+<footer class="bg-[#0b2f2d] text-teal-100 text-center py-6 text-sm">VaultNest — Fixed Deposit Calculator. Estimates only; confirm rates and penalties with your bank before investing.</footer>
+<script id="lib-vaultnest">var VaultNestLib = (function(){
+  function round2(n){ return Math.round((n+Number.EPSILON)*100)/100; }
+  function effectiveRate(baseRate, senior){
+    var r = Number(baseRate);
+    if(!isFinite(r)) return 0;
+    return round2(r + (senior ? 0.5 : 0));
+  }
+  function maturityValue(principal, annualRatePct, years, compoundsPerYear){
+    var P=Number(principal), r=Number(annualRatePct)/100, t=Number(years), n=Number(compoundsPerYear)||4;
+    if(!isFinite(P)||!isFinite(r)||!isFinite(t)||P<=0||t<=0) return 0;
+    if(r<=0) return round2(P);
+    return round2(P*Math.pow(1+r/n, n*t));
+  }
+  function interestEarned(principal, annualRatePct, years, compoundsPerYear){
+    var m=maturityValue(principal, annualRatePct, years, compoundsPerYear);
+    if(m===0) return 0;
+    return round2(m - Number(principal));
+  }
+  function payoutAmount(principal, annualRatePct, mode){
+    var P=Number(principal), r=Number(annualRatePct)/100;
+    if(!isFinite(P)||!isFinite(r)||P<=0||r<=0) return 0;
+    if(mode==='monthly') return round2(P*r/12);
+    if(mode==='quarterly') return round2(P*r/4);
+    return 0; // lump sum pays at maturity
+  }
+  function payoutSchedule(principal, annualRatePct, years, mode){
+    var per=payoutAmount(principal, annualRatePct, mode);
+    if(per<=0) return {perPayout:0, count:0, totalPayout:0};
+    var count = mode==='monthly' ? Math.round(Number(years)*12) : Math.round(Number(years)*4);
+    return {perPayout:per, count:count, totalPayout:round2(per*count)};
+  }
+  function prematureValue(principal, baseRate, senior, yearsElapsed, penaltyPct, compoundsPerYear){
+    var pen = penaltyPct===undefined?1:Number(penaltyPct);
+    var eff = effectiveRate(baseRate, senior);
+    var penalised = Math.max(0, round2(eff - pen));
+    var val = maturityValue(principal, penalised, yearsElapsed, compoundsPerYear||4);
+    var noPenaltyVal = maturityValue(principal, eff, yearsElapsed, compoundsPerYear||4);
+    return {effectiveRate:eff, penalisedRate:penalised, value:val, valueWithoutPenalty:noPenaltyVal, penaltyCost:round2(noPenaltyVal-val)};
+  }
+  function yearWise(principal, annualRatePct, years, compoundsPerYear){
+    var rows=[]; var P=Number(principal);
+    var whole=Math.floor(Number(years));
+    for(var y=1;y<=whole;y++){
+      var opening = y===1? round2(P) : rows[y-2].closing;
+      var closing = maturityValue(P, annualRatePct, y, compoundsPerYear);
+      var prev = y===1? P : maturityValue(P, annualRatePct, y-1, compoundsPerYear);
+      rows.push({year:y, opening:round2(prev), interest:round2(closing-prev), closing:closing});
+    }
+    // fractional final year
+    if(Number(years)>whole && whole>=0){
+      var closingF=maturityValue(P, annualRatePct, years, compoundsPerYear);
+      var prevF= whole===0? P : maturityValue(P, annualRatePct, whole, compoundsPerYear);
+      rows.push({year:Number(years), opening:round2(prevF), interest:round2(closingF-prevF), closing:closingF});
+    }
+    return rows;
+  }
+  function validate(principal, baseRate, years){
+    var errs=[];
+    if(!isFinite(Number(principal))||Number(principal)<=0) errs.push('Enter a deposit amount greater than zero.');
+    if(Number(principal)>1000000000) errs.push('Deposit amount looks unusually large — please check it.');
+    if(!isFinite(Number(baseRate))||Number(baseRate)<=0||Number(baseRate)>25) errs.push('Enter an interest rate between 0.1% and 25%.');
+    if(!isFinite(Number(years))||Number(years)<=0||Number(years)>30) errs.push('Enter a tenure between 0.1 and 30 years.');
+    return errs;
+  }
+  function formatINR(n){
+    if(!isFinite(n)) return '₹0';
+    return '₹' + Number(round2(n)).toLocaleString('en-IN',{maximumFractionDigits:2, minimumFractionDigits:0});
+  }
+  return {round2:round2, effectiveRate:effectiveRate, maturityValue:maturityValue, interestEarned:interestEarned, payoutAmount:payoutAmount, payoutSchedule:payoutSchedule, prematureValue:prematureValue, yearWise:yearWise, validate:validate, formatINR:formatINR};
+})();
+if (typeof module !== 'undefined' && module.exports) { module.exports = VaultNestLib; }
+</script>
+<script>
+var $=function(id){return document.getElementById(id)};
+function fmt(n){return VaultNestLib.formatINR(n)}
+function calc(){
+ var P=parseFloat(document.getElementById('principal').value), rate=parseFloat(document.getElementById('rate').value), yrs=parseFloat(document.getElementById('years').value), comp=parseInt(document.getElementById('comp').value), senior=document.getElementById('senior').checked, mode=document.getElementById('mode').value;
+ var errs=VaultNestLib.validate(P,rate,yrs);
+ if(errs.length){document.getElementById('msg').textContent=errs[0];document.getElementById('rMaturity').textContent='—';document.getElementById('rInterest').textContent='—';document.getElementById('rPayout').textContent='—';document.getElementById('tbody').innerHTML='';document.getElementById('rEarly').textContent='Fix the inputs above to see your estimate.';return;}
+ document.getElementById('msg').textContent='';
+ var eff=VaultNestLib.effectiveRate(rate,senior);
+ document.getElementById('effRate').textContent='Effective rate applied: '+eff.toFixed(2)+'% p.a.'+(senior?' (includes +0.50% senior premium)':'');
+ var mat=VaultNestLib.maturityValue(P,eff,yrs,comp);
+ var intr=VaultNestLib.interestEarned(P,eff,yrs,comp);
+ document.getElementById('rMaturity').textContent=fmt(mat); document.getElementById('rInterest').textContent=fmt(intr);
+ if(mode==='lump'){document.getElementById('rPayoutLabel').textContent='Paid at Maturity';document.getElementById('rPayout').textContent=fmt(mat);document.getElementById('rPayoutSub').textContent='Principal + all compounded interest';}
+ else{var s=VaultNestLib.payoutSchedule(P,eff,yrs,mode);document.getElementById('rPayoutLabel').textContent=mode==='monthly'?'Monthly Payout':'Quarterly Payout';document.getElementById('rPayout').textContent=fmt(s.perPayout);document.getElementById('rPayoutSub').textContent=s.count+' payouts · Total '+fmt(s.totalPayout)+' · Principal returned at maturity';}
+ var ey=parseFloat(document.getElementById('earlyYears').value)||0, pen=parseFloat(document.getElementById('penalty').value); if(!isFinite(pen)) pen=1;
+ if(ey>0 && ey<yrs){var pv=VaultNestLib.prematureValue(P,rate,senior,ey,pen,comp);document.getElementById('rEarly').textContent='After '+ey+' year(s) at a penalised rate of '+pv.penalisedRate.toFixed(2)+'% you would receive about '+fmt(pv.value)+' instead of '+fmt(pv.valueWithoutPenalty)+' — a penalty cost of '+fmt(pv.penaltyCost)+'.';}
+ else{document.getElementById('rEarly').textContent='Enter a withdrawal time shorter than the full tenure to estimate the penalty cost.';}
+ var rows=VaultNestLib.yearWise(P,eff,yrs,comp);
+ document.getElementById('tbody').innerHTML=rows.map(function(r){return '<tr class="border-b last:border-0"><td class="py-2 font-semibold">'+r.year+'</td><td>'+fmt(r.opening)+'</td><td class="text-teal-700 font-semibold">+'+fmt(r.interest)+'</td><td class="font-bold">'+fmt(r.closing)+'</td></tr>'}).join('');
+}
+['principal','rate','years','comp','mode','senior','earlyYears','penalty'].forEach(function(id){document.getElementById(id).addEventListener('input',calc);document.getElementById(id).addEventListener('change',calc);});
+document.getElementById('copyBtn').addEventListener('click',function(){var t='VaultNest FD Summary: Maturity '+document.getElementById('rMaturity').textContent+', Interest '+document.getElementById('rInterest').textContent; if(navigator.clipboard) navigator.clipboard.writeText(t); document.getElementById('copyBtn').textContent='Copied ✓'; setTimeout(function(){document.getElementById('copyBtn').textContent='Copy Summary'},1500);});
+calc();
+</script>
+</body></html>
